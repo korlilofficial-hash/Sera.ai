@@ -51,7 +51,7 @@
             add("Sera думает...", 'a', tid);
 
             try {
-                const res = await fetch("/api", {
+                const res = await fetch("/api/chat", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ text: txt, system: PROMPT })

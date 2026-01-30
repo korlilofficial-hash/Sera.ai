@@ -2,94 +2,118 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SeraAi — Русская нейросеть</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SeraAi — Руссомания</title>
     <style>
-        :root { --primary: #6366f1; --bg: #0f172a; --glass: rgba(255, 255, 255, 0.07); --text: #f8fafc; }
-        body { margin: 0; font-family: sans-serif; background: radial-gradient(circle at top right, #1e1b4b, #0f172a); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
-        header { padding: 1rem; display: flex; align-items: center; gap: 12px; backdrop-filter: blur(15px); border-bottom: 1px solid var(--glass); }
-        .avatar { width: 40px; height: 40px; border-radius: 10px; background: var(--primary); }
-        .site-name { font-size: 1.3rem; font-weight: 800; background: linear-gradient(90deg, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
-        .btn-open { padding: 15px 35px; background: var(--primary); color: white; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 10px 20px rgba(99,102,241,0.4); }
-        #chat-container { display: none; flex-direction: column; height: 90vh; width: 100%; max-width: 600px; margin: 0 auto; background: rgba(15,23,42,0.9); border-radius: 20px 20px 0 0; }
-        #messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .msg { padding: 12px; border-radius: 15px; max-width: 80%; font-size: 14px; }
-        .user-msg { background: var(--primary); align-self: flex-end; }
-        .ai-msg { background: var(--glass); align-self: flex-start; border: 1px solid rgba(255,255,255,0.1); }
-        .chat-area { padding: 15px; display: flex; gap: 5px; background: #1e293b; }
-        input { flex: 1; background: #0f172a; border: 1px solid var(--glass); padding: 10px; border-radius: 20px; color: white; }
+        :root { --p: #7c3aed; --bg: #0b0f1a; --g: rgba(255,255,255,0.05); }
+        body { 
+            margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background: var(--bg); color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+        }
+        header { 
+            padding: 15px 20px; display: flex; align-items: center; gap: 12px; 
+            background: rgba(11, 15, 26, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--g);
+        }
+        .ava { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(45deg, var(--p), #3b82f6); border: 1.5px solid rgba(255,255,255,0.2); }
+        .hero { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; }
+        .hero h1 { font-size: 2.5rem; margin: 0; background: linear-gradient(to right, #a78bfa, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .btn { 
+            margin-top: 25px; padding: 16px 40px; background: var(--p); border: none; border-radius: 50px; 
+            color: white; font-weight: bold; font-size: 1rem; cursor: pointer; box-shadow: 0 10px 25px rgba(124, 58, 237, 0.3);
+        }
+        #chat { display: none; flex-direction: column; height: 100%; width: 100%; max-width: 700px; margin: 0 auto; }
+        #msgs { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
+        .m { padding: 12px 18px; border-radius: 20px; max-width: 85%; font-size: 15px; line-height: 1.5; position: relative; }
+        .u { background: var(--p); align-self: flex-end; border-bottom-right-radius: 4px; }
+        .a { background: #1e293b; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid var(--g); }
+        .input-area { padding: 15px; display: flex; gap: 10px; background: #161b2a; border-top: 1px solid var(--g); }
+        input { 
+            flex: 1; background: #0b0f1a; border: 1px solid #334155; padding: 14px 20px; 
+            border-radius: 30px; color: white; outline: none; font-size: 16px;
+        }
+        .status { font-size: 12px; color: #6366f1; text-align: center; margin-bottom: 5px; opacity: 0.8; }
     </style>
 </head>
 <body>
 
 <header>
-    <img src="https://via.placeholder.com" class="avatar">
-    <div class="site-name">SeraAi</div>
+    <img src="https://via.placeholder.com" class="ava" id="site-avatar">
+    <div style="font-weight: 700; font-size: 1.4rem; letter-spacing: -0.5px;">SeraAi</div>
 </header>
 
-<main class="hero" id="hero">
-    <h1>Русская нейросеть</h1>
-    <p>Создано Руссомания. Без регистрации.</p>
-    <button class="btn-open" onclick="startChat()">Начать диалог</button>
+<main class="hero" id="h">
+    <h1>SeraAi</h1>
+    <p style="color: #94a3b8; font-size: 1.1rem; margin-top: 10px;">Русская нейросеть от <b>Руссомания</b><br>Без регистрации и VPN</p>
+    <button class="btn" onclick="start()">Открыть диалог</button>
 </main>
 
-<div id="chat-container">
-    <div id="messages"></div>
-    <div class="chat-area">
-        <input type="text" id="user-input" placeholder="Напиши Sera...">
-        <button onclick="sendMessage()" style="color:white; background:none; border:none; font-weight:bold;">></button>
+<div id="chat">
+    <div id="msgs"></div>
+    <div class="status" id="st"></div>
+    <div class="input-area">
+        <input type="text" id="ui" placeholder="Спроси о чем-нибудь..." onkeypress="if(event.key==='Enter') send()">
+        <button onclick="send()" style="background:var(--p); border:none; width:45px; height:45px; border-radius:50%; color:white; cursor:pointer; font-size:20px;">➔</button>
     </div>
 </div>
 
 <script>
-    const PROMPT = "Тебя зовут Sera. Создатель: Руссомания. Говори только по-русски.";
+    // Твой промт (инструкция)
+    const PROMPT = "Тебя зовут Sera. Тебя создала компания Руссомания. Ты — продвинутая русская нейросеть. Ты разговариваешь ТОЛЬКО на русском языке. Будь вежливой и отвечай по существу.";
 
-    function startChat() {
-        document.getElementById("hero").style.display = "none";
-        document.getElementById("chat-container").style.display = "flex";
-        addMessage("Привет! Я Sera от Руссомания. О чем пообщаемся?", 'ai-msg');
+    function start() {
+        document.getElementById('h').style.display = 'none';
+        document.getElementById('chat').style.display = 'flex';
+        add("Привет! Я Sera. Чем я, как нейросеть от Руссомании, могу вам помочь?", 'a');
     }
 
-    async function sendMessage() {
-        const input = document.getElementById("user-input");
+    async function send() {
+        const input = document.getElementById('ui');
         const text = input.value.trim();
         if(!text) return;
 
-        addMessage(text, 'user-msg');
+        add(text, 'u');
         input.value = "";
         
-        const tempId = "t-" + Date.now();
-        addMessage("Sera думает...", 'ai-msg', tempId);
+        const tempId = "t" + Date.now();
+        add("Sera думает...", 'a', tempId);
+        document.getElementById('st').innerText = "Sera печатает...";
 
         try {
-            // Используем надежный бесплатный API шлюз (CORS Proxy + Free LLM)
-            const response = await fetch(`https://open-ai-api-production.up.railway.app`, {
+            // Используем свободный шлюз, который не требует ключей и работает в РФ
+            const response = await fetch("https://api.airforce", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    model: "gpt-3.5-turbo", // Эмуляция через бесплатный мост
+                    model: "llama-3-70b-chat",
                     messages: [
                         {role: "system", content: PROMPT},
                         {role: "user", content: text}
-                    ]
+                    ],
+                    temperature: 0.7
                 })
             });
+
+            if (!response.ok) throw new Error();
+
             const data = await response.json();
-            document.getElementById(tempId).innerText = data.choices[0].message.content;
+            const reply = data.choices[0].message.content;
+            
+            document.getElementById(tempId).innerText = reply;
         } catch (e) {
-            document.getElementById(tempId).innerText = "Ошибка сервера. Попробуй позже!";
+            document.getElementById(tempId).innerText = "Sera: Извините, произошел технический сбой на серверах Руссомания. Попробуйте еще раз через минуту!";
+        } finally {
+            document.getElementById('st').innerText = "";
         }
     }
 
-    function addMessage(t, c, id) {
+    function add(text, type, id) {
         const d = document.createElement("div");
-        d.className = `msg ${c}`;
+        d.className = `m ${type}`;
         if(id) d.id = id;
-        d.innerText = t;
-        const m = document.getElementById("messages");
-        m.appendChild(d);
-        m.scrollTop = m.scrollHeight;
+        d.innerText = text;
+        const container = document.getElementById("msgs");
+        container.appendChild(d);
+        container.scrollTop = container.scrollHeight;
     }
 </script>
 </body>

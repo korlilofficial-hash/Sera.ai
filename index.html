@@ -26,14 +26,13 @@
 <body>
 
 <header>
-    <!-- Место для твоей аватарки -->
     <img src="https://via.placeholder.com" class="ava" id="main-logo">
     <div style="font-weight: 700; font-size: 1.4rem;">SeraAi</div>
 </header>
 
 <main class="hero" id="h">
     <h1>SeraAi</h1>
-    <p style="color: #94a3b8; font-size: 1.1rem; margin-top: 10px;">Русская нейросеть от <b>Руссомания</b><br>Доступна без регистрации</p>
+    <p style="color: #94a3b8; font-size: 1.1rem; margin-top: 10px;">Русская нейросеть от <b>Руссомания</b><br>Работает через защищенный бэкенд</p>
     <button class="btn" onclick="start()">Открыть диалог</button>
 </main>
 
@@ -47,17 +46,12 @@
 </div>
 
 <script>
-    // Обманываем сканер GitHub, разрезая токен на две части
-    const k1 = "hf_XUCPNFMkFMVtxry";
-    const k2 = "MobrLgEpQRbGwqomXzV";
-    const TOKEN = k1 + k2;
-
-    const PROMPT = "Тебя зовут Sera. Тебя создала компания Руссомания. Ты — продвинутая русская нейросеть. Ты разговариваешь ТОЛЬКО на русском языке. Отвечай кратко и по делу.";
+    const PROMPT = "Тебя зовут Sera. Тебя создала компания Руссомания. Ты — продвинутая русская нейросеть. Разговаривай ТОЛЬКО на русском.";
 
     function start() {
         document.getElementById('h').style.display = 'none';
         document.getElementById('chat').style.display = 'flex';
-        add("Привет! Я Sera. Нейросеть от компании Руссомания. Чем могу помочь?", 'a');
+        add("Привет! Я Sera. Бэкенд настроен, я готова к общению. Чем помочь?", 'a');
     }
 
     async function send() {
@@ -70,35 +64,30 @@
         
         const tid = "t" + Date.now();
         add("Sera думает...", 'a', tid);
-        document.getElementById('st').innerText = "Соединение с сервером Руссомания...";
+        document.getElementById('st').innerText = "Запрос к серверу...";
 
         try {
-            const response = await fetch(
-                "https://api-inference.huggingface.co",
-                {
-                    method: "POST",
-                    headers: { 
-                        "Content-Type": "application/json",
-                        "Authorization": "Bearer " + TOKEN 
-                    },
-                    body: JSON.stringify({ 
-                        inputs: `<|im_start|>system\n${PROMPT}<|im_end|>\n<|im_start|>user\n${text}<|im_end|>\n<|im_start|>assistant\n`,
-                        parameters: { max_new_tokens: 500, return_full_text: false }
-                    }),
-                }
-            );
+            // Запрос идет на твою серверную функцию Vercel
+            const response = await fetch("/api/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: text, system: PROMPT })
+            });
 
             const data = await response.json();
 
-            if (data.error && data.estimated_time) {
-                document.getElementById(tid).innerText = "Sera просыпается... Повтори запрос через 20 секунд.";
+            if (data.error) {
+                document.getElementById(tid).innerText = "Ошибка сервера: " + (data.error.message || "попробуйте позже.");
                 return;
             }
 
-            let reply = data[0]?.generated_text || data.generated_text || "Ошибка ответа.";
-            document.getElementById(tid).innerText = reply.trim();
+            let reply = "";
+            if (Array.isArray(data)) reply = data[0].generated_text;
+            else reply = data.generated_text;
+
+            document.getElementById(tid).innerText = reply.trim() || "Sera: Я задумалась, повтори!";
         } catch (e) {
-            document.getElementById(tid).innerText = "Ошибка сети. Проверь интернет!";
+            document.getElementById(tid).innerText = "Ошибка соединения с бэкендом Vercel.";
         } finally {
             document.getElementById('st').innerText = "Онлайн";
         }

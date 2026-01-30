@@ -2,7 +2,7 @@ export default async function handler(req, res) {
   const { text, system } = req.body;
   const TOKEN = process.env.HF_TOKEN;
 
-  // Прямой путь через роутер к конкретной модели
+  // ИСПОЛЬЗУЕМ САМЫЙ СТАБИЛЬНЫЙ ЭНДПОИНТ
   const URL = "https://router.huggingface.co";
 
   try {
@@ -13,33 +13,32 @@ export default async function handler(req, res) {
         "Authorization": `Bearer ${TOKEN.trim()}` 
       },
       body: JSON.stringify({ 
-        inputs: `<|im_start|>system\n${system}<|im_end|>\n<|im_start|>user\n${text}<|im_end|>\n<|im_start|>assistant\n`,
-        parameters: { max_new_tokens: 500, return_full_text: false }
+        model: "meta-llama/Llama-3.2-3B-Instruct", // Эта модель — «рабочая лошадка»
+        messages: [
+            { role: "system", content: system },
+            { role: "user", content: text }
+        ],
+        parameters: { max_new_tokens: 500 }
       }),
     });
 
     const resText = await response.text();
-    let data;
-    try {
-        data = JSON.parse(resText);
-    } catch(e) {
-        return res.status(200).json({ reply: "Sera: Ошибка сервера (не JSON). Ответ: " + resText });
+    
+    // Если всё равно 404 — значит Vercel не видит папку api
+    if (response.status === 404) {
+        return res.status(200).json({ reply: "Sera: Ошибка 404. Попробуйте переименовать файл в api/index.js" });
     }
+
+    const data = JSON.parse(resText);
 
     if (data.error) {
-      if (data.estimated_time) return res.status(200).json({ reply: "Sera просыпается... (загрузка модели)" });
-      return res.status(200).json({ reply: "Ошибка: " + (data.error.message || JSON.stringify(data.error)) });
+      return res.status(200).json({ reply: "Sera: " + (data.error.message || JSON.stringify(data.error)) });
     }
 
-    // В классическом API ответ — это массив объектов [{generated_text: "..."}]
-    const result = Array.isArray(data) ? data[0].generated_text : data.generated_text;
-    
-    // Очистка от технических тегов
-    const clean = (result || "").replace(/<\|im_end\|>/g, "").replace(/<\|im_start\|>/g, "").trim();
-
-    return res.status(200).json({ reply: clean || "Sera: Я задумалась, повтори запрос!" });
+    const reply = data.choices[0].message.content;
+    return res.status(200).json({ reply: reply.trim() });
 
   } catch (error) {
-    return res.status(200).json({ reply: "Критическая ошибка бэкенда: " + error.message });
+    return res.status(200).json({ reply: "Ошибка: " + error.message });
   }
 }

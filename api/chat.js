@@ -26,12 +26,14 @@ export default async function handler(req, res) {
       return res.status(200).json({ reply: "Sera просыпается... Повторите через 15 секунд." });
     }
 
-    // ВНИМАНИЕ: Правильное извлечение текста из массива Hugging Face
+    // ХИТРЫЙ ИЗВЛЕКАТЕЛЬ: Проверяем все варианты ответа
     let reply = "";
     if (Array.isArray(data) && data[0] && data[0].generated_text) {
-      reply = data[0].generated_text;
+      reply = data[0].generated_text; // Самый частый формат HF
+    } else if (data.generated_text) {
+      reply = data.generated_text;
     } else {
-      reply = data.generated_text || "Я получила данные, но формат странный. Попробуй еще раз!";
+      reply = "Sera: Не удалось распознать ответ сервера. Попробуй еще раз!";
     }
 
     return res.status(200).json({ reply: reply.trim() });

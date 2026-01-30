@@ -5,7 +5,6 @@ export default async function handler(req, res) {
   const TOKEN = process.env.HF_TOKEN;
 
   try {
-    // ВНИМАНИЕ: Исправленный URL
     const response = await fetch(
       "https://api-inference.huggingface.co",
       {
@@ -23,17 +22,16 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // Если модель спит (бесплатный тариф)
     if (data.error && data.estimated_time) {
-      return res.status(200).json({ reply: "Sera просыпается... Подождите 15-20 секунд." });
+      return res.status(200).json({ reply: "Sera просыпается... Повторите через 15 секунд." });
     }
 
-    // Если всё ок, HF присылает массив: [{generated_text: "..."}]
+    // ВНИМАНИЕ: Правильное извлечение текста из массива Hugging Face
     let reply = "";
-    if (Array.isArray(data) && data[0].generated_text) {
+    if (Array.isArray(data) && data[0] && data[0].generated_text) {
       reply = data[0].generated_text;
     } else {
-      reply = data.generated_text || "Sera: Я задумалась, повтори!";
+      reply = data.generated_text || "Я получила данные, но формат странный. Попробуй еще раз!";
     }
 
     return res.status(200).json({ reply: reply.trim() });

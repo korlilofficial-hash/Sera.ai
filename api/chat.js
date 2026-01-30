@@ -3,7 +3,7 @@ export default async function handler(req, res) {
   const TOKEN = process.env.HF_TOKEN;
 
   // САМЫЙ ПРЯМОЙ АДРЕС БЕЗ ЛИШНИХ СЛОВ
-  const URL = "https://api-inference.huggingface.co";
+  const URL = "https://router.huggingface.co";
 
   try {
     const response = await fetch(URL, {

@@ -1,12 +1,13 @@
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).send('Только POST');
+  if (req.method !== 'POST') return res.status(405).send('Метод не разрешен');
   
   const { text, system } = req.body;
   const TOKEN = process.env.HF_TOKEN;
 
   try {
+    // ВНИМАНИЕ: Исправленный URL
     const response = await fetch(
-      "https://router.huggingface.co",
+      "https://api-inference.huggingface.co",
       {
         method: "POST",
         headers: { 
@@ -22,16 +23,22 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    if (data.error) {
-      if (data.estimated_time) return res.status(200).json({ reply: "Sera просыпается... Подождите 20 секунд." });
-      return res.status(200).json({ reply: "Ошибка: " + JSON.stringify(data.error) });
+    // Если модель спит (бесплатный тариф)
+    if (data.error && data.estimated_time) {
+      return res.status(200).json({ reply: "Sera просыпается... Подождите 15-20 секунд." });
     }
 
-    // Обработка ответа (Hugging Face возвращает массив объектов)
-    const result = Array.isArray(data) ? data[0].generated_text : data.generated_text;
-    return res.status(200).json({ reply: result || "Пустой ответ" });
+    // Если всё ок, HF присылает массив: [{generated_text: "..."}]
+    let reply = "";
+    if (Array.isArray(data) && data[0].generated_text) {
+      reply = data[0].generated_text;
+    } else {
+      reply = data.generated_text || "Sera: Я задумалась, повтори!";
+    }
+
+    return res.status(200).json({ reply: reply.trim() });
 
   } catch (error) {
-    return res.status(200).json({ reply: "Ошибка сервера: " + error.message });
+    return res.status(200).json({ reply: "Ошибка на бэкенде: " + error.message });
   }
 }

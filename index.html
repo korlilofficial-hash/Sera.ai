@@ -2,94 +2,109 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SeraAi — Руссомания</title>
     <style>
-        :root { --p: #8b5cf6; --bg: #030712; --msg-ai: #1f2937; }
-        body { margin:0; font-family: sans-serif; background: var(--bg); color: white; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        header { padding: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #374151; background: #030712; }
-        .ava { width: 35px; height: 35px; border-radius: 8px; background: var(--p); }
-        .hero { flex:1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
-        .btn { padding: 15px 35px; background: var(--p); border: none; border-radius: 50px; color: white; font-weight: bold; cursor: pointer; }
-        #chat { display: none; flex-direction: column; height: 100%; width: 100%; max-width: 600px; margin: 0 auto; }
-        #msgs { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .m { padding: 12px 16px; border-radius: 18px; max-width: 85%; line-height: 1.4; font-size: 15px; }
-        .u { background: var(--p); align-self: flex-end; }
-        .a { background: var(--msg-ai); align-self: flex-start; border: 1px solid #374151; }
-        .input-box { padding: 15px; background: #111827; display: flex; gap: 10px; border-top: 1px solid #374151; }
-        input { flex: 1; background: #1f2937; border: none; padding: 12px 20px; border-radius: 25px; color: white; outline: none; }
+        :root { --p: #7c3aed; --bg: #0b0f1a; --g: rgba(255,255,255,0.06); }
+        body { margin: 0; font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        header { padding: 15px 20px; display: flex; align-items: center; gap: 12px; background: rgba(11, 15, 26, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--g); }
+        .ava { width: 38px; height: 38px; border-radius: 10px; background: var(--p); object-fit: cover; border: 1.5px solid rgba(255,255,255,0.2); }
+        .hero { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; }
+        .hero h1 { font-size: 2.8rem; margin: 0; background: linear-gradient(to right, #a78bfa, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+        .btn { margin-top: 25px; padding: 16px 40px; background: var(--p); border: none; border-radius: 50px; color: white; font-weight: bold; font-size: 1rem; cursor: pointer; box-shadow: 0 10px 25px rgba(124, 58, 237, 0.3); transition: 0.2s; }
+        .btn:active { transform: scale(0.95); }
+        #chat { display: none; flex-direction: column; height: 100%; width: 100%; max-width: 700px; margin: 0 auto; background: #0f172a; }
+        #msgs { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .m { padding: 14px 18px; border-radius: 20px; max-width: 85%; font-size: 15px; line-height: 1.5; animation: f 0.3s ease; }
+        @keyframes f { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .u { background: var(--p); align-self: flex-end; border-bottom-right-radius: 4px; }
+        .a { background: #1e293b; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid var(--g); }
+        .in-area { padding: 15px; display: flex; gap: 10px; background: #161b2a; border-top: 1px solid var(--g); padding-bottom: env(safe-area-inset-bottom, 15px); }
+        input { flex: 1; background: #0b0f1a; border: 1px solid #334155; padding: 14px 20px; border-radius: 30px; color: white; outline: none; font-size: 16px; }
+        .st { font-size: 11px; color: #818cf8; text-align: center; padding: 5px; background: #0b0f1a; }
     </style>
 </head>
 <body>
 
 <header>
-    <img src="https://via.placeholder.com" class="ava" id="site-ava">
-    <div style="font-weight: bold; font-size: 1.2rem;">SeraAi</div>
+    <!-- ЗАМЕНИ ССЫЛКУ НИЖЕ НА СВОЮ АВАТАРКУ -->
+    <img src="https://via.placeholder.com" class="ava" id="main-ava">
+    <div style="font-weight: 700; font-size: 1.4rem;">SeraAi</div>
 </header>
 
 <main class="hero" id="h">
     <h1>SeraAi</h1>
-    <p style="color: #9ca3af;">Русская нейросеть от <b>Руссомания</b><br>Без регистрации и VPN</p>
+    <p style="color: #94a3b8; font-size: 1.1rem; margin-top: 10px;">Русская нейросеть от <b>Руссомания</b><br>Доступна без регистрации</p>
     <button class="btn" onclick="start()">Открыть диалог</button>
 </main>
 
 <div id="chat">
     <div id="msgs"></div>
-    <div class="input-box">
-        <input type="text" id="ui" placeholder="Напиши Sera..." onkeypress="if(event.key==='Enter') send()">
-        <button onclick="send()" style="background:none; border:none; color:var(--p); font-size: 24px; cursor: pointer;">➔</button>
+    <div class="st" id="st"></div>
+    <div class="in-area">
+        <input type="text" id="ui" placeholder="Спроси Sera..." onkeypress="if(event.key==='Enter') send()">
+        <button onclick="send()" style="background:var(--p); border:none; width:48px; height:48px; border-radius:50%; color:white; cursor:pointer; font-size:20px;">➔</button>
     </div>
 </div>
 
 <script>
-    const SYSTEM = "Тебя зовут Sera. Создана компанией Руссомания. Ты говоришь только по-русски. Будь вежливой.";
+    const TOKEN = "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"; // Твой токен активирован
+    const PROMPT = "Тебя зовут Sera. Тебя создала компания Руссомания. Ты — продвинутая русская нейросеть. Ты разговариваешь ТОЛЬКО на русском языке. Отвечай кратко и по делу.";
 
     function start() {
         document.getElementById('h').style.display = 'none';
         document.getElementById('chat').style.display = 'flex';
-        add("Привет! Я Sera от Руссомания. Готова к общению!", 'a');
+        add("Привет! Я Sera. Нейросеть от компании Руссомания. Чем могу помочь?", 'a');
     }
 
     async function send() {
-        const i = document.getElementById('ui');
-        const txt = i.value.trim();
-        if(!txt) return;
+        const input = document.getElementById('ui');
+        const text = input.value.trim();
+        if(!text) return;
 
-        add(txt, 'u');
-        i.value = "";
+        add(text, 'u');
+        input.value = "";
+        
         const tid = "t" + Date.now();
-        add("Sera думает...", 'a', tid);
+        add("Sera печатает...", 'a', tid);
+        document.getElementById('st').innerText = "Соединение с сервером Руссомания...";
 
         try {
-            // Используем DuckDuckGo AI Proxy (через свободный шлюз)
-            const res = await fetch("https://api.duckduckgo.com", { mode: 'no-cors' }); 
-            
-            // Если предыдущий шлюз не работает, пробуем альтернативный (Llama 3)
-            const response = await fetch("https://api.codetabs.com", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    model: "llama-3-70b-chat",
-                    messages: [{role: "system", content: SYSTEM}, {role: "user", content: txt}]
-                })
-            });
-            
+            const response = await fetch(
+                "https://api-inference.huggingface.co",
+                {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${TOKEN}` 
+                    },
+                    body: JSON.stringify({ 
+                        inputs: `<|im_start|>system\n${PROMPT}<|im_end|>\n<|im_start|>user\n${text}<|im_end|>\n<|im_start|>assistant\n`,
+                        parameters: { max_new_tokens: 500, return_full_text: false }
+                    }),
+                }
+            );
+
             const data = await response.json();
-            document.getElementById(tid).innerText = data.choices[0].message.content;
+            // Вытаскиваем текст из ответа HuggingFace
+            const reply = data[0]?.generated_text || data.generated_text || "Хм, возникла заминка. Попробуешь еще раз?";
+            
+            document.getElementById(tid).innerText = reply.trim();
         } catch (e) {
-            // Резервный ответ, если все API заблокированы
-            document.getElementById(tid).innerText = "Ошибка сети. Возможно, GitHub временно блокирует запрос. Попробуйте обновить страницу!";
+            document.getElementById(tid).innerText = "Ошибка доступа. Проверьте интернет или токен!";
+        } finally {
+            document.getElementById('st').innerText = "Онлайн";
         }
     }
 
-    function add(t, c, id) {
+    function add(t, type, id) {
         const d = document.createElement("div");
-        d.className = `m ${c}`;
+        d.className = `m ${type}`;
         if(id) d.id = id;
         d.innerText = t;
-        const m = document.getElementById("msgs");
-        m.appendChild(d);
-        m.scrollTop = m.scrollHeight;
+        const container = document.getElementById("msgs");
+        container.appendChild(d);
+        container.scrollTop = container.scrollHeight;
     }
 </script>
 </body>

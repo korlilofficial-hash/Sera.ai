@@ -2,7 +2,7 @@ export default async function handler(req, res) {
   const { text, system } = req.body;
   const TOKEN = process.env.HF_TOKEN;
 
-  // ПРАВИЛЬНЫЙ URL ДЛЯ РОУТЕРА (с указанием задачи)
+  // Используем максимально стабильный эндпоинт v1 (как у OpenAI)
   const URL = "https://router.huggingface.co";
 
   try {
@@ -13,7 +13,7 @@ export default async function handler(req, res) {
         "Authorization": `Bearer ${TOKEN.trim()}` 
       },
       body: JSON.stringify({ 
-        model: "Qwen/Qwen2.5-7B-Instruct", // Указываем модель здесь
+        model: "meta-llama/Llama-3.2-3B-Instruct", // Эта модель всегда онлайн
         messages: [
             { role: "system", content: system },
             { role: "user", content: text }
@@ -22,18 +22,24 @@ export default async function handler(req, res) {
       }),
     });
 
-    const data = await response.json();
-
-    if (data.error) {
-      if (data.estimated_time) return res.status(200).json({ reply: "Sera просыпается... (загрузка 20 сек)" });
-      return res.status(200).json({ reply: "Ошибка HF: " + JSON.stringify(data.error) });
+    // Читаем как текст, чтобы поймать ошибку, если это не JSON
+    const resText = await response.text();
+    let data;
+    try {
+        data = JSON.parse(resText);
+    } catch(e) {
+        return res.status(200).json({ reply: "Sera: Ошибка связи (Not Found). Проверьте Redeploy на Vercel." });
     }
 
-    // В новом роутере ответ приходит как у OpenAI (choices[0].message.content)
+    if (data.error) {
+      return res.status(200).json({ reply: "Sera: " + (data.error.message || JSON.stringify(data.error)) });
+    }
+
+    // Извлекаем ответ в формате OpenAI
     const reply = data.choices[0].message.content;
     return res.status(200).json({ reply: reply.trim() });
 
   } catch (error) {
-    return res.status(200).json({ reply: "Ошибка: " + error.message });
+    return res.status(200).json({ reply: "Ошибка бэкенда: " + error.message });
   }
 }

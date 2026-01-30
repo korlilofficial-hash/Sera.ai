@@ -22,21 +22,29 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
+    // Если модель еще не загружена
     if (data.error && data.estimated_time) {
-      return res.status(200).json({ reply: "Sera просыпается... Повторите через 15 секунд." });
+      return res.status(200).json({ reply: "Sera просыпается... Повторите запрос через 20 секунд." });
     }
 
-    // ХИТРЫЙ ИЗВЛЕКАТЕЛЬ: Проверяем все варианты ответа
+    // ВЫТЯГИВАЕМ ТЕКСТ (Жесткий метод)
     let reply = "";
-    if (Array.isArray(data) && data[0] && data[0].generated_text) {
-      reply = data[0].generated_text; // Самый частый формат HF
+    
+    if (Array.isArray(data) && data.length > 0) {
+      // Если пришел массив (как обычно в HF)
+      reply = data[0].generated_text || data[0].text || "";
     } else if (data.generated_text) {
+      // Если пришел объект
       reply = data.generated_text;
     } else {
-      reply = "Sera: Не удалось распознать ответ сервера. Попробуй еще раз!";
+      // Если вообще не понятно что, выводим сырые данные для отладки
+      reply = "Sera: Ошибка формата данных. Получено: " + JSON.stringify(data);
     }
 
-    return res.status(200).json({ reply: reply.trim() });
+    // Убираем лишние технические теги, если они остались
+    const cleanReply = reply.replace(/<\|im_end\|>/g, "").replace(/<\|im_start\|>/g, "").trim();
+
+    return res.status(200).json({ reply: cleanReply || "Sera: Я задумалась, повтори!" });
 
   } catch (error) {
     return res.status(200).json({ reply: "Ошибка на бэкенде: " + error.message });

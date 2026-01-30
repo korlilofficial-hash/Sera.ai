@@ -1,14 +1,12 @@
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).send('Только POST запросы');
+  if (req.method !== 'POST') return res.status(405).send('Только POST');
   
   const { text, system } = req.body;
   const TOKEN = process.env.HF_TOKEN;
 
-  if (!TOKEN) return res.status(200).json({ reply: "Ошибка: Токен HF_TOKEN не найден в настройках Vercel!" });
-
   try {
     const response = await fetch(
-      "https://api-inference.huggingface.co",
+      "https://router.huggingface.co",
       {
         method: "POST",
         headers: { 
@@ -25,13 +23,13 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     if (data.error) {
-      // Если модель грузится, HF возвращает estimated_time
-      if (data.estimated_time) return res.status(200).json({ reply: "Sera просыпается (загрузка модели)... Подождите 20 секунд и напишите еще раз." });
-      return res.status(200).json({ reply: "Ошибка от HuggingFace: " + JSON.stringify(data.error) });
+      if (data.estimated_time) return res.status(200).json({ reply: "Sera просыпается... Подождите 20 секунд." });
+      return res.status(200).json({ reply: "Ошибка: " + JSON.stringify(data.error) });
     }
 
+    // Обработка ответа (Hugging Face возвращает массив объектов)
     const result = Array.isArray(data) ? data[0].generated_text : data.generated_text;
-    return res.status(200).json({ reply: result || "Пустой ответ от модели" });
+    return res.status(200).json({ reply: result || "Пустой ответ" });
 
   } catch (error) {
     return res.status(200).json({ reply: "Ошибка сервера: " + error.message });
